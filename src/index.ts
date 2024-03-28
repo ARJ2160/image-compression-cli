@@ -1,7 +1,8 @@
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
-import { acceptedImageTypes } from "../constants/constants";
+const inquirer = require("inquirer");
+import { questions, acceptedImageTypes } from "../constants/constants";
 
 function compressImages(inputPath: string, outputPath = inputPath) {
   fs.readdir(inputPath, (err, files) => {
@@ -10,20 +11,22 @@ function compressImages(inputPath: string, outputPath = inputPath) {
       return;
     }
 
+    const originalSizes: number[] = [];
+
     const imageFiles = files.filter((file) => {
       // Store original image sizes
-      // fs.stat(inputPath + "/" + file, (err, stats) => {
-      //   if (err) {
-      //     console.log(`File doesn't exist.`);
-      //   } else {
-      //     originalSizes.push({ name: file, old_size: stats.size + "Bytes" });
-      //   }
-      // });
+      fs.stat(inputPath + "/" + file, (err, stats) => {
+        if (err) {
+          console.log(`File doesn't exist.`);
+        } else {
+          originalSizes.push(stats.size);
+        }
+      });
       const ext = path.extname(file).toLowerCase();
       return acceptedImageTypes.includes(ext);
     });
 
-    imageFiles.forEach((image) => {
+    imageFiles.forEach((image, i) => {
       const inputFilePath = path.join(inputPath, image);
       const outputFilePath = path.join(outputPath, image);
       sharp(inputFilePath).toFile(outputFilePath, (err, info) => {
@@ -31,31 +34,37 @@ function compressImages(inputPath: string, outputPath = inputPath) {
           console.log("Error compressing image:", err);
           return;
         }
-        console.log(`Compressed '${image}' => ${info.size} bytes`);
+        console.log(
+          `Compressed '${image}' from ${originalSizes[i]} bytes => ${info.size} bytes`
+        );
       });
     });
   });
 }
 
-const args = process.argv.slice(2);
-const inputPath = args[0];
-const outputPath = args[1];
+let inputPath = "";
+let outputPath = "";
 
-// Check if inputPath is provided
-if (!inputPath) {
-  console.error("Please provide a directory path as input");
-  process.exit(1);
-}
+inquirer.prompt(questions).then((answers: any) => {
+  inputPath = answers.inputPath;
+  outputPath = answers.outputPath;
 
-// Check if inputPath exists
-if (!fs.existsSync(inputPath)) {
-  console.error("Input directory does not exist");
-  process.exit(1);
-}
+  // Check if inputPath is provided
+  if (!inputPath) {
+    console.error("Please provide a directory path as input");
+    process.exit(1);
+  }
 
-// If outputPath is provided, check if it exists, otherwise create it
-if (outputPath && !fs.existsSync(outputPath)) {
-  fs.mkdirSync(outputPath, { recursive: true });
-}
+  // Check if inputPath exists
+  if (!fs.existsSync(inputPath)) {
+    console.error("Input directory does not exist");
+    process.exit(1);
+  }
 
-compressImages(inputPath, outputPath);
+  // If outputPath is provided, check if it exists, otherwise create it
+  if (outputPath && !fs.existsSync(outputPath)) {
+    fs.mkdirSync(outputPath, { recursive: true });
+  }
+
+  compressImages(inputPath, outputPath);
+});
