@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import sharp from "sharp";
-import { acceptedImageTypes } from "./constants";
+import { acceptedImageTypes } from "../constants/constants";
 
 function compressImages(inputPath: string, outputPath = inputPath) {
   fs.readdir(inputPath, (err, files) => {
@@ -11,6 +11,14 @@ function compressImages(inputPath: string, outputPath = inputPath) {
     }
 
     const imageFiles = files.filter((file) => {
+      // Store original image sizes
+      // fs.stat(inputPath + "/" + file, (err, stats) => {
+      //   if (err) {
+      //     console.log(`File doesn't exist.`);
+      //   } else {
+      //     originalSizes.push({ name: file, old_size: stats.size + "Bytes" });
+      //   }
+      // });
       const ext = path.extname(file).toLowerCase();
       return acceptedImageTypes.includes(ext);
     });
@@ -23,7 +31,7 @@ function compressImages(inputPath: string, outputPath = inputPath) {
           console.log("Error compressing image:", err);
           return;
         }
-        console.log(`Compressed ${image} to ${info.size} bytes`);
+        console.log(`Compressed '${image}' => ${info.size} bytes`);
       });
     });
   });
