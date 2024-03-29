@@ -5,11 +5,11 @@ export const questions = [
   {
     type: "input",
     name: "inputPath",
-    message: "Enter the path to the image folder",
+    message: "Enter the path to the image folder - ",
   },
   {
     type: "input",
     name: "outputPath",
-    message: "Enter the path to output folder",
+    message: "Enter the path to output folder - ",
   },
 ];
