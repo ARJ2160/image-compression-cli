@@ -28,8 +28,20 @@ function compressImages(inputPath: string, outputPath = inputPath) {
     });
 
     imageFiles.forEach((image, i) => {
-      const inputFilePath = path.join(inputPath, image);
-      const outputFilePath = path.join(outputPath, image);
+      let inputFilePath = path.join(inputPath, image);
+      let outputFilePath = path.join(outputPath, image);
+
+      if (outputPath === inputPath) {
+        let newFileName =
+          image.slice(0, image.lastIndexOf(".")) +
+          " Compressed" +
+          image.slice(image.lastIndexOf("."));
+
+        outputFilePath = path.join(inputPath, newFileName);
+      } else {
+        outputFilePath = path.join(outputPath, image);
+      }
+
       sharp(inputFilePath).toFile(outputFilePath, (err, info) => {
         if (err) {
           console.log("Error compressing image:", err);
@@ -65,6 +77,10 @@ inquirer.prompt(questions).then((answers: any) => {
   // If outputPath is provided, check if it exists, otherwise create it
   if (outputPath && !fs.existsSync(outputPath)) {
     fs.mkdirSync(outputPath, { recursive: true });
+  }
+
+  if (outputPath === "") {
+    outputPath = inputPath;
   }
 
   compressImages(inputPath, outputPath);
