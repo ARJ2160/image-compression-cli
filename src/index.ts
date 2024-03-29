@@ -29,7 +29,7 @@ function compressImages(inputPath: string, outputPath = inputPath) {
 
     imageFiles.forEach((image, i) => {
       let inputFilePath = path.join(inputPath, image);
-      let outputFilePath = path.join(outputPath, image);
+      let outputFilePath = "";
 
       if (outputPath === inputPath) {
         let newFileName =
