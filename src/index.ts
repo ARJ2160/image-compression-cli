@@ -48,7 +48,9 @@ function compressImages(inputPath: string, outputPath = inputPath) {
           return;
         }
         console.log(
-          `Compressed '${image}' from ${originalSizes[i]} bytes => ${info.size} bytes`
+          `Compressed '${image}' from ${originalSizes[i]} bytes => ${
+            info.size
+          } bytes (${(info.size / 1024).toFixed(2)} KB)`
         );
       });
     });
@@ -62,7 +64,7 @@ inquirer.prompt(questions).then((answers: any) => {
   inputPath = answers.inputPath;
   outputPath = answers.outputPath;
 
-  // Check if inputPath is provided
+  // Check if inputPath isnt provided
   if (!inputPath) {
     console.error("Please provide a directory path as input");
     process.exit(1);
